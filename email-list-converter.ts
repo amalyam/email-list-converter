@@ -1,4 +1,4 @@
-import { fs } from "fs";
+//import { fs } from "fs";
 import { Contact } from "./contact-interface";
 
 /*
@@ -8,12 +8,13 @@ to a CSV file format "First Name, Last Name, Email Address"
 */
 
 class EmailListConverter {
+  constructor(public fileName: string) {}
   public emailTxt: string = this.getEmailTxt();
   public contactsArray: Contact[];
   public csvText: string = `First Name, Last Name, Email Address\n`;
 
   getEmailTxt(): string {
-    return fs.readFile("email-list.txt");
+    return fs.readFile(this.fileName);
   }
 
   filterEmailArray() {
@@ -38,4 +39,11 @@ class EmailListConverter {
       this.csvText += `${newContact.firstName}, ${newContact.lastName}, ${newContact.email}\n`;
     });
   }
+
+  print() {
+    console.log(this.csvText);
+  }
 }
+
+const newEmailList = new EmailListConverter("email-list.txt");
+newEmailList.print();

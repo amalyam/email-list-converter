@@ -41,6 +41,5 @@ dist/**/*
 # ignore yarn.lock
 yarn.lock
 
-# Email List
-.csv
+# Email list files + notes
 .txt
