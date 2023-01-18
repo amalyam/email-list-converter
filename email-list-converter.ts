@@ -1,5 +1,5 @@
-//import { fs } from "fs";
-import { Contact } from "./contact-interface";
+import fs from "fs";
+import Contact from "./contact-interface";
 
 /*
 Converts a .txt list of emails in format 
