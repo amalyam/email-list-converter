@@ -20,23 +20,25 @@ class EmailListConverter {
   filterEmailArray() {
     // each array item is a string of "FirstName LastName <email@website.com>"
     let unfilteredEmailArr: string[] = this.emailTxt.split(",");
+    const contactRegex =
+      /(?<first>[\w\-]*) *(?<last>[\w\-\s]*\w)\s *<(?<email>.*)>/gm;
 
-    // make each entry into a Contact object, push to contactsArray
-    // firstName is between [0] and first space
-    // lastName is between first space and <
-    // email is between < and entry.length - 1
+    // make each entry into a Contact object, push to contactsArray, add to CSV string for output
     unfilteredEmailArr.forEach((entry) => {
-      let firstSpace = entry.indexOf(" ");
-      let openAngBr = entry.indexOf("<");
       let newContact: Contact = { firstName: "", lastName: "", email: "" };
+      let entryInfo = entry.match(contactRegex);
 
-      newContact.firstName = entry.slice(0, firstSpace);
-      newContact.lastName = entry.slice(firstSpace + 1, openAngBr);
-      newContact.email = entry.slice(openAngBr + 1, entry.length - 1);
+      if (entryInfo) {
+        newContact.firstName = entryInfo[0];
+        newContact.lastName = entryInfo[1];
+        newContact.email = entryInfo[2];
 
-      this.contactsArray.push(newContact);
+        this.contactsArray.push(newContact);
 
-      this.csvText += `${newContact.firstName}, ${newContact.lastName}, ${newContact.email}\n`;
+        this.csvText += `${newContact.firstName}, ${newContact.lastName}, ${newContact.email}\n`;
+      } else {
+        throw new Error("Cannot process contact info");
+      }
     });
   }
 
@@ -45,5 +47,5 @@ class EmailListConverter {
   }
 }
 
-const newEmailList = new EmailListConverter("email-list.txt");
+const newEmailList = new EmailListConverter("../email-list.txt");
 newEmailList.print();
