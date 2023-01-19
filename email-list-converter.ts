@@ -10,11 +10,11 @@ to a CSV file format "First Name, Last Name, Email Address"
 class EmailListConverter {
   constructor(public fileName: string) {}
   public emailTxt: string = this.getEmailTxt();
-  public contactsArray: Contact[];
+  public contactsArray: Contact[] = [];
   public csvText: string = `First Name, Last Name, Email Address\n`;
 
   getEmailTxt(): string {
-    return fs.readFile(this.fileName);
+    return fs.readFileSync(`${this.fileName}`, "utf8");
   }
 
   filterEmailArray() {
@@ -28,7 +28,7 @@ class EmailListConverter {
     unfilteredEmailArr.forEach((entry) => {
       let firstSpace = entry.indexOf(" ");
       let openAngBr = entry.indexOf("<");
-      let newContact: Contact;
+      let newContact: Contact = { firstName: "", lastName: "", email: "" };
 
       newContact.firstName = entry.slice(0, firstSpace);
       newContact.lastName = entry.slice(firstSpace + 1, openAngBr);
