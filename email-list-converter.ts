@@ -5,14 +5,12 @@ import Contact from "./contact-interface";
 Converts a .txt list of emails in format 
 "FirstName LastName <email@website.com>"
 to a CSV file format "First Name, Last Name, Email Address"
-
-contact full regex: /(?<first>[\w\-]*) *(?<last>[\w\-\s]*\w)\s *<(?<email>.*)>/gm;
 */
 
 class EmailListConverter {
   constructor(public fileName: string) {}
   public contactsArray: Contact[] = [];
-  public csvText: string = `First Name, Last Name, Email Address,\n`;
+  public csvText: string = `First Name, Last Name, Email Address\n`;
 
   getEmailTxt(): string {
     return fs.readFileSync(`${this.fileName}`, "utf8");
@@ -32,7 +30,7 @@ class EmailListConverter {
         lastName: entry.groups?.last ?? "",
         email: entry.groups?.email ?? "",
       };
-      this.csvText += `${newContact.firstName}, ${newContact.lastName}, ${newContact.email},\n`;
+      this.csvText += `${newContact.firstName}, ${newContact.lastName}, ${newContact.email}\n`;
 
       this.contactsArray.push(newContact);
     });
@@ -41,8 +39,20 @@ class EmailListConverter {
   print() {
     console.log(this.csvText);
   }
+
+  outputToFile() {
+    const today = new Date();
+
+    fs.writeFileSync(
+      `email-list_${today.getMonth() + 1}-${today.getDate()}-${today
+        .getFullYear()
+        .toString()
+        .slice(2)}`,
+      this.csvText
+    );
+  }
 }
 
 const newEmailList = new EmailListConverter("./email-list.txt");
 newEmailList.processContacts();
-newEmailList.print();
+newEmailList.outputToFile();
