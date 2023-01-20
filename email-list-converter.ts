@@ -5,13 +5,13 @@ import Contact from "./contact-interface";
 Converts a .txt list of emails in format 
 "FirstName LastName <email@website.com>"
 to a CSV file format "First Name, Last Name, Email Address"
+
+contact full regex: /(?<first>[\w\-]*) *(?<last>[\w\-\s]*\w)\s *<(?<email>.*)>/gm;
 */
 
 class EmailListConverter {
   constructor(public fileName: string) {}
-  public emailTxt: string = this.getEmailTxt();
-  unfilteredEmailArr: string[] = this.emailTxt.split(",");
-  // public contactsArray: Contact[] = [];
+  public contactsArray: Contact[] = [];
   public csvText: string = `First Name, Last Name, Email Address,\n`;
 
   getEmailTxt(): string {
@@ -21,23 +21,20 @@ class EmailListConverter {
   processContacts() {
     // each array item is a string of "FirstName LastName <email@website.com>"
     const contactRegex =
-      /(?<first>[\w\-]*) *(?<last>[\w\-\s]*\w)\s *<(?<email>.*)>/gm;
+      /^(?<first>[\w\-]*) +(?<last>[\w\-\s]*?) *<(?<email>.*)>,?$/gm;
+    let emailTxt: string = this.getEmailTxt();
+    let unfilteredEmailArr = [...emailTxt.matchAll(contactRegex)];
 
     // make each entry into a Contact object, push to contactsArray, add to CSV string for output
-    this.unfilteredEmailArr.forEach((entry) => {
-      //let newContact: Contact = { firstName: "", lastName: "", email: "" };
-      let entryInfoArr = entry.match(contactRegex);
+    unfilteredEmailArr.forEach((entry) => {
+      let newContact: Contact = {
+        firstName: entry.groups?.first ?? "",
+        lastName: entry.groups?.last ?? "",
+        email: entry.groups?.email ?? "",
+      };
+      this.csvText += `${newContact.firstName}, ${newContact.lastName}, ${newContact.email},\n`;
 
-      if (entryInfoArr) {
-        entryInfoArr.forEach((contact) => {
-          contact.replace(" ", ", ");
-          this.csvText += `${contact},\n`;
-        });
-
-        //this.contactsArray.push(newContact);
-      } else {
-        throw new Error("Cannot process contact info");
-      }
+      this.contactsArray.push(newContact);
     });
   }
 
